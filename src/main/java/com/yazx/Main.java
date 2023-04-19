@@ -12,6 +12,7 @@ import com.yazx.service.IpCheckService;
 import com.yazx.service.Ipv6CheckService;
 import com.yazx.service.impl.IpCheckServiceImpl;
 import com.yazx.service.impl.Ipv6CheckServiceImpl;
+import com.yazx.utils.Ipv6Util;
 
 import java.io.IOException;
 
@@ -26,8 +27,6 @@ public class Main {
         IpRealtimeDataFinderSimpleRedisImpl simpleRedis = new IpRealtimeDataFinderSimpleRedisImpl(new RedisConf(
                 new String[]{"localhost:6379"}, null, "123456"
         ));
-        IIpRealtimeDataFinder ipRealtimeFinder = simpleRedis;
-        IpBaseInfoFinder ipBaseFinder = simpleRedis;
 
         IIpHistoryDataFinder finderMysql = new IpHistoryDataFinderMysqlImpl(new MysqlConf(
                 "",
@@ -37,9 +36,9 @@ public class Main {
         ), scoreConf.getMaxExpireTime());
 
         //3. 创建查询service
-        IpCheckService ipCheckService = new IpCheckServiceImpl(scoreConf, ipRealtimeFinder,
+        IpCheckService ipCheckService = new IpCheckServiceImpl(scoreConf, simpleRedis,
                 finderMysql,
-                ipBaseFinder);
+                simpleRedis);
 
         Ipv6DataFinderRedisImpl finder = new Ipv6DataFinderRedisImpl(new RedisConf(
                 new String[]{"localhost:6379/1"}, null, "123456"
@@ -48,6 +47,9 @@ public class Main {
 
         // 4. 查询数据
         IpData ipData;
+        String extendIpv6 = Ipv6Util.extendIpv6("240e:0320:0d03:1977::");
+        String prefix = Ipv6Util.getPrefix(extendIpv6);
+        String subnet = Ipv6Util.getSubnet(extendIpv6);
         try {
             IpData data = ipCheckService.checkRealtimeIp("183.197.198.69", true);
             System.out.println(data);
@@ -55,7 +57,7 @@ public class Main {
             System.out.println(ipData);
             Ipv6Data check = ipv6CheckService.check("240e:0320:0d03", "1977", 1667889809);
             System.out.println(check);
-            check = ipv6CheckService.check("240e:0320:0d03", "1977", System.currentTimeMillis() / 1000);
+            check = ipv6CheckService.check(prefix, subnet, System.currentTimeMillis() / 1000);
             System.out.println(check);
         } catch (Exception e) {
             throw new RuntimeException(e);

@@ -81,7 +81,7 @@ public class GetIpScoreService {
         OkHttpClient httpClient = new OkHttpClient.Builder()
                 .build();
         Request req = new Request.Builder()
-                .url("http://ipdata.yazx.com/api/ipv4/user/rule/")
+                .url("https://ipdata.yazx.com/api/ipv4/user/rule/")
                 .post(RequestBody.create("{\"snuser\": \"" + mSnUser + "\"}", MediaType.parse("application/json")))
                 .build();
 
