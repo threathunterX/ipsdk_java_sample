@@ -15,6 +15,8 @@ import com.yazx.service.impl.Ipv6CheckServiceImpl;
 import com.yazx.utils.Ipv6Util;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.stream.Collectors;
 
 public class Main {
 
@@ -46,16 +48,11 @@ public class Main {
         Ipv6CheckService ipv6CheckService = new Ipv6CheckServiceImpl(scoreConf, finder, finder);
 
         // 4. 查询数据
-        IpData ipData;
         String extendIpv6 = Ipv6Util.extendIpv6("240e:0320:0d03:1977::");
         String prefix = Ipv6Util.getPrefix(extendIpv6);
         String subnet = Ipv6Util.getSubnet(extendIpv6);
         try {
-            IpData data = ipCheckService.checkRealtimeIp("183.197.198.69", true);
-            System.out.println(data);
-            ipData = ipCheckService.checkHistoryIp("36.104.211.44", 1670282889, true);
-            System.out.println(ipData);
-            Ipv6Data check = ipv6CheckService.check("240e:0320:0d03", "1977", 1667889809);
+            Ipv6Data check = ipv6CheckService.check(prefix, subnet, 1667889809);
             System.out.println(check);
             check = ipv6CheckService.check(prefix, subnet, System.currentTimeMillis() / 1000);
             System.out.println(check);
